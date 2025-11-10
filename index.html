@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Random Quote Machine — Ice</title>
+		<style>
+			:root {
+				--bg: #0b0c10;
+				--surface: #111218;
+				--ink: #e8ecf1;
+				--muted: #bac1cc;
+				--brand: #7c5cff;
+				--ring: rgba(124, 92, 255, 0.4);
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: var(--ink);
+				font: 16px/1.6 Inter, system-ui, -apple-system, Segoe UI, Roboto,
+					Helvetica, Arial;
+			}
+			.wrap {
+				min-height: 100vh;
+				display: grid;
+				place-items: center;
+				padding: 24px;
+			}
+			/* The FCC test #11: ensure #quote-box is horizontally centered */
+			#quote-box {
+				width: min(680px, 90vw);
+				margin: 0 auto;
+				background: var(--surface);
+				border: 1px solid rgba(255, 255, 255, 0.08);
+				border-radius: 18px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+				padding: 28px;
+			}
+			.row {
+				display: flex;
+				gap: 12px;
+				align-items: center;
+				justify-content: space-between;
+				flex-wrap: wrap;
+			}
+			#text {
+				font-size: clamp(20px, 2.6vw, 28px);
+				margin: 0 0 10px;
+			}
+			#author {
+				color: var(--muted);
+				text-align: right;
+				margin: 6px 0 18px;
+			}
+			.btn {
+				appearance: none;
+				border: 1px solid rgba(255, 255, 255, 0.16);
+				padding: 10px 14px;
+				border-radius: 12px;
+				background: transparent;
+				color: var(--ink);
+				text-decoration: none;
+				cursor: pointer;
+			}
+			.btn:hover {
+				box-shadow: 0 0 0 6px var(--ring);
+			}
+			.btn.primary {
+				background: linear-gradient(90deg, var(--brand), #00d4ff);
+				border: none;
+			}
+			.meta {
+				display: flex;
+				gap: 10px;
+				align-items: center;
+			}
+			.credits {
+				margin-top: 14px;
+				color: var(--muted);
+				font-size: 12px;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wrap">
+			<div id="quote-box"></div>
+		</div>
+
+		<!-- React 17 (avoid React 18 test issues) -->
+		<script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+		<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+		<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+		<script type="text/babel">
+			const QUOTES = [
+				{
+					text: "Programs must be written for people to read, and only incidentally for machines to execute.",
+					author: "Harold Abelson",
+				},
+				{ text: "Talk is cheap. Show me the code.", author: "Linus Torvalds" },
+				{
+					text: "First, solve the problem. Then, write the code.",
+					author: "John Johnson",
+				},
+				{
+					text: "Simplicity is the soul of efficiency.",
+					author: "Austin Freeman",
+				},
+				{
+					text: "Before software can be reusable it first has to be usable.",
+					author: "Ralph Johnson",
+				},
+				{
+					text: "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+					author: "Martin Fowler",
+				},
+				{
+					text: "The most disastrous thing that you can ever learn is your first programming language.",
+					author: "Alan Kay",
+				},
+			];
+
+			function getRandomQuote(prevIdx = -1) {
+				if (QUOTES.length === 1) return { idx: 0, ...QUOTES[0] };
+				let idx = prevIdx;
+				while (idx === prevIdx) {
+					idx = Math.floor(Math.random() * QUOTES.length);
+				}
+				return { idx, ...QUOTES[idx] };
+			}
+
+			function QuoteMachine() {
+				const [state, setState] = React.useState(() => getRandomQuote());
+
+				const handleNew = () => setState((q) => getRandomQuote(q.idx));
+
+				const tweetHref = React.useMemo(() => {
+					const msg = `"${state.text}" — ${state.author}`;
+					return `https://twitter.com/intent/tweet?hashtags=quotes&text=${encodeURIComponent(
+						msg
+					)}`;
+				}, [state]);
+
+				return (
+					<div>
+						<blockquote id="text">{state.text}</blockquote>
+						<div id="author">— {state.author}</div>
+						<div className="row">
+							<div className="meta">
+								<a
+									id="tweet-quote"
+									className="btn"
+									href={tweetHref}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									Tweet
+								</a>
+							</div>
+							<button
+								id="new-quote"
+								className="btn primary"
+								onClick={handleNew}
+							>
+								New Quote
+							</button>
+						</div>
+						<div className="credits">Made with React 17 • Vanilla CSS</div>
+					</div>
+				);
+			}
+
+			function App() {
+				return (
+					<div id="quote-box">
+						<QuoteMachine />
+					</div>
+				);
+			}
+
+			ReactDOM.render(<App />, document.getElementById("quote-box"));
+		</script>
+
+		<!-- FCC tests -->
+		<script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
+	</body>
+</html>
